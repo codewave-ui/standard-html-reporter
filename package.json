@@ -1,0 +1,46 @@
+{
+  "name": "@codewave-ui/standard-html-reporter",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsup"
+  },
+  "repository": "https://github.com/codewave-ui/standard-html-reporter",
+  "keywords": [
+    "frontend",
+    "test",
+    "automation",
+    "ui",
+    "reporter",
+    "html",
+    "codewave-ui"
+  ],
+  "author": "Joshua Lauwrich Nandy",
+  "license": "MIT",
+  "description": "Standard HTML Reporter for Codewave UI Automation Framework",
+  "packageManager": "pnpm@9.4.0+sha512.f549b8a52c9d2b8536762f99c0722205efc5af913e77835dbccc3b0b0b2ca9e7dc8022b78062c17291c48e88749c70ce88eb5a74f1fa8c4bf5e18bb46c8bd83a",
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.8.0",
+    "@tsconfig/node22": "^22.0.0",
+    "@types/luxon": "^3.4.2",
+    "@types/node": "^20.14.13",
+    "@typescript-eslint/eslint-plugin": "^7.17.0",
+    "@typescript-eslint/parser": "^7.17.0",
+    "@wdio/types": "^8.39.0",
+    "eslint": "^9.8.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.8.0",
+    "prettier": "^3.3.3",
+    "tsc-alias": "^1.8.10",
+    "tsup": "^8.2.3",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^7.17.0"
+  },
+  "dependencies": {
+    "@codewave-ui/core": "latest"
+  }
+}
