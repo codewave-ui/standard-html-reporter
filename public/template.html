@@ -1,0 +1,263 @@
+<html class="theme-dark" lang="">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+        name="viewport">
+  <meta content="ie=edge" http-equiv="X-UA-Compatible">
+  <title>Go To Test</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css"
+    rel="stylesheet"
+  >
+  <link href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-divider@1.1.0/dist/bulma-divider.min.css"
+        rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+  <style>
+      body.has-navbar-fixed-top, html.has-navbar-fixed-top {
+          padding-top: 168px;
+      }
+
+      .card:has(.parent-hidden) .cui-test-step {
+          opacity: 0;
+      }
+
+      .card:has(.parent-shown) .cui-test-step {
+          opacity: 1;
+      }
+
+      .cui-test-step {
+          transition: opacity 0.3s ease-in;
+          z-index: 0;
+      }
+
+      .cui-card-section {
+          z-index: 10;
+          position: relative;
+      }
+
+      .cui-card-content {
+          transition: max-height 0.5s ease-in;
+      }
+
+      .message-header {
+          padding: 6px 12px;
+      }
+
+      .cui-message-body .cui-item {
+          display: flex;
+      }
+
+      .cui-message-body .cui-item *:first-child {
+          width: 55px;
+      }
+
+      .cui-message-body .cui-item *:not(:first-child) {
+          margin-left: 4px;
+      }
+
+      .cui-message-body .cui-item *:not(:last-child) {
+          margin-right: 4px;
+      }
+  </style>
+</head>
+<body class="has-navbar-fixed-top">
+
+<nav class="navbar is-fixed-top is-spaced pl-5 pr-2"
+     id="summary" role="navigation">
+  <div class="navbar-brand">
+    <div class="navbar-item is-flex is-flex-direction-column is-align-items-center"><span
+      class="is-size-6">Result:</span><span
+      class="is-size-2" id="summary-result-text">SKIP</span></div>
+  </div>
+  <div class="navbar-menu ml-3 pl-3" id="summary-item">
+    <div class="navbar-start">
+      <div class="navbar-item is-flex is-flex-direction-column" style="border-left:2px solid">
+        <div class="is-size-5"><span style="width:50px;display:inline-block">Total</span><span>:</span><span
+          class="ml-3" id="summary-total" style="width:25px;display:inline-block">1</span></div>
+        <div class="is-size-5"><span style="width:50px;display:inline-block">Pass</span><span>:</span><span
+          class="ml-3" id="summary-pass" style="width:25px;display:inline-block">1</span></div>
+        <div class="is-size-5"><span style="width:50px;display:inline-block">Fail</span><span>:</span><span
+          class="ml-3" id="summary-fail" style="width:25px;display:inline-block">0</span></div>
+        <div class="is-size-5"><span style="width:50px;display:inline-block">Skip</span><span>:</span><span
+          class="ml-3" id="summary-skip" style="width:25px;display:inline-block">0</span></div>
+      </div>
+    </div>
+    <div class="navbar-end" style="width:100%">
+      <div class="navbar-item is-flex is-flex-direction-column is-align-items-flex-end is-justify-content-center"
+           style="border-left:2px solid;height:100%;">
+        <div class="is-size-3 has-text-weight-bold" id="summary-ts"
+             style="white-space: nowrap;text-overflow: ellipsis;overflow: hidden;width: calc(100vw - 405px);">-
+        </div>
+        <div><span class="is-size-6 has-text-weight-bold" id="summary-id"></span></div>
+        <div><span class="is-size-6 has-text-weight-bold" id="summary-date"></span></div>
+        <div><span class="is-size-6 has-text-weight-bold" id="summary-duration"></span></div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div id="main-content"></div>
+
+<script>
+  const DateTime = luxon.DateTime;
+
+  const STATUS_COLOR_CLASS_MAPPING = [
+    'is-warning', 'is-danger', 'is-success'
+  ];
+  const STATUS_TEXT_MAPPING = [
+    'SKIP', 'FAILED', 'SUCCESS'
+  ];
+  const STATUS = {
+    'SUCCESS': 2,
+    'FAILED': 1,
+    'SKIP': 0
+  };
+
+  // REPLACE DATA HERE
+
+  function convertMillisToFullDateTimeString(millis) {
+    return DateTime.fromJSDate(new Date(millis)).toFormat('cccc, dd LLLL yyyy - hh:mm:ss.u ZZ');
+  }
+
+  function convertMillisToTimeString(millis) {
+    return DateTime.fromJSDate(new Date(millis)).toFormat('hh:mm:ss.u');
+  }
+
+  function convertMillisToDateString(millis) {
+    return DateTime.fromJSDate(new Date(millis)).toFormat('cccc, dd LLLL yyyy');
+  }
+
+  // Update summary
+  document.title = data._name;
+  const summaryEl = document.getElementById('summary');
+  const summaryText = document.getElementById('summary-result-text');
+  summaryEl.classList.add(STATUS_COLOR_CLASS_MAPPING[data._status]);
+  summaryText.innerText = STATUS_TEXT_MAPPING[data._status];
+  let total = 0, success = 0, failed = 0, skip = 0;
+  for (const tc of data._testCases) {
+    total++;
+    if (tc._status === STATUS.SUCCESS) success++;
+    else if (tc._status === STATUS.FAILED) failed++;
+    else skip++;
+  }
+  document.getElementById('summary-total').innerText = total.toString();
+  document.getElementById('summary-pass').innerText = success.toString();
+  document.getElementById('summary-fail').innerText = failed.toString();
+  document.getElementById('summary-skip').innerText = skip.toString();
+
+  document.getElementById('summary-ts').innerText = data._name;
+  document.getElementById('summary-id').innerText = data._id;
+  document.getElementById('summary-date').innerText = convertMillisToDateString(data._start);
+  document.getElementById('summary-duration').innerText = data._duration;
+
+  function generateTestStepDetail({ start, end, duration, name, isExpanded, exception, screenshot }) {
+    return `<div class="is-small message cui-test-step ${exception ? 'is-danger' : ''}" style="width: 100%; cursor: pointer; margin-bottom: 12px">
+          <div class="message-body p-2" style="word-break: break-word;">
+            <div style="display: flex">
+              <span style="width: 75px; margin-right: 4px">${convertMillisToTimeString(start)}</span>
+              <span style="flex: 1; margin-left: 4px">${name}</span>
+            </div>
+            <div class="cui-message-body ${!isExpanded ? 'is-hidden' : ''}" style="margin-left: 83px">
+              <div class="cui-item"><p>Start</p><p>:</p><p>${convertMillisToFullDateTimeString(start)}</p></div>
+              <div class="cui-item"><p>End</p><p>:</p><p>${convertMillisToFullDateTimeString(end)}</p></div>
+              <div class="cui-item"><p>Duration</p><p>:</p><p>${duration}</p></div>
+              ${exception ? `<div class="cui-item"><p>Exception</p><p>:</p><p>${exception.replaceAll('\n', '<br>')}</p></div>` : ''}
+              ${screenshot ? `<a title="click to open in new tab" class="stop-propagation" target="_blank" href="${screenshot}"><img style="max-height: 500px; width: auto; margin-top: 8px" src="${screenshot}" alt="screenshot"/></a>` : ''}
+            </div>
+          </div>
+        </div>`;
+  }
+
+  const mainContentEl = document.getElementById('main-content');
+  let mainContentHTML = '';
+  for (const tc of data._testCases) {
+    let tc_detail = '';
+    for (const beforeHooks of tc._beforeHooks) {
+      const expanded = beforeHooks._status === STATUS.FAILED;
+      tc_detail += generateTestStepDetail({
+        name: '@BeforeTestCase | ' + beforeHooks._name,
+        start: beforeHooks._start,
+        end: beforeHooks._end,
+        duration: beforeHooks._duration,
+        isExpanded: expanded
+      });
+    }
+
+    for (let i = 0; i < tc._testSteps.length; i++) {
+      const testStep = tc._testSteps[i];
+      const expanded = tc._status === STATUS.FAILED && i === tc._testSteps.length - 1;
+      console.log(expanded, tc._exception);
+      tc_detail += generateTestStepDetail({
+        start: testStep._start,
+        end: testStep._end,
+        duration: testStep._duration,
+        isExpanded: expanded,
+        name: `${testStep._name}(${Object.entries(testStep._args).map((val) => val[0] + ': ' + val[1]).join(', ')})`,
+        exception: expanded ? tc._exception : undefined,
+        screenshot: expanded ? tc._screenshot : undefined
+      });
+    }
+
+    for (const afterHooks of tc._afterHooks) {
+      const expanded = afterHooks._status === STATUS.FAILED;
+      tc_detail += generateTestStepDetail({
+        name: '@AfterTestCase | ' + afterHooks._name,
+        start: afterHooks._start,
+        end: afterHooks._end,
+        duration: afterHooks._duration,
+        isExpanded: expanded
+      });
+    }
+
+    const expanded = tc._status === STATUS.FAILED;
+    const contentHeight = (100 * (tc._beforeHooks.length + tc._testSteps.length + tc._afterHooks.length)) + 606;
+    const heightNow = expanded ? contentHeight : 0;
+    mainContentHTML += `<div class="section" style="padding: 1rem 3rem">
+  <div class="card">
+    <div class="card-content ${expanded ? 'parent-shown' : 'parent-hidden'} cui-card-section" style="cursor: pointer;" data-height="${contentHeight}">
+      <p class="is-size-4 has-text-weight-bold" style="position: relative">
+        ${tc._name}
+        <span class="tag is-medium ${STATUS_COLOR_CLASS_MAPPING[tc._status]}" style="position: absolute; right: 0; top: 0; width: 100px">${STATUS_TEXT_MAPPING[tc._status]}</span>
+      </p>
+      <p class="subtitle is-size-6">${tc._id}</p>
+    </div>
+    <footer class="card-footer cui-card-content" style="max-height: ${heightNow}">
+      <div class="card-footer-item is-flex-direction-column is-align-items-flex-start">
+      ${tc_detail}
+      </div>
+    </footer>
+  </div>
+</div>`;
+  }
+  mainContentEl.innerHTML = mainContentHTML;
+
+  document.querySelectorAll('.cui-card-section').forEach((el) => el.addEventListener('click', toggle));
+
+  function toggle(event) {
+    const target = event.currentTarget;
+    const childEl = target.parentElement.querySelector('.cui-card-content');
+    if (target.classList.contains('parent-hidden')) {
+      target.classList.remove('parent-hidden', 'parent-shown');
+      target.classList.add('parent-shown');
+      const height = target.getAttribute('data-height');
+      childEl.style.maxHeight = height + 'px';
+    } else {
+      target.classList.remove('parent-hidden', 'parent-shown');
+      target.classList.add('parent-hidden');
+      childEl.style.maxHeight = '0px';
+    }
+  }
+
+  function toggleMessageBody(event) {
+    const targetEl = event.currentTarget.querySelector('.cui-message-body');
+    console.log(event.currentTarget);
+    console.log(targetEl);
+    targetEl.classList.toggle('is-hidden');
+  }
+
+  document.querySelectorAll('.cui-test-step').forEach((el) => el.addEventListener('click', toggleMessageBody));
+  document.querySelectorAll('.stop-propagation').forEach((el) => el.addEventListener('click', (e) => e.stopPropagation()));
+
+</script>
+</body>
+</html>

@@ -1,3 +1,3 @@
-# @codewave-ui/standard-console-reporter
+# @codewave-ui/standard-html-reporter
 
-Default Codewave UI Reporter in Console Log
+Default Codewave UI Reporter in HTML format
